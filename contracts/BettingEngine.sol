@@ -101,10 +101,33 @@ contract BettingEngine
   event IdentifyPlayerWinnings(address _player, uint256 amount);
   event PlayerWithdrawsMoney(address _player, uint256 amount);
   event RestartingRegistrationPhase();
-  
+
+  // to check - todo  
+  // what happens to extra players when a game start occurs
   function isGameReadyToStart() view public returns (bool) {
     return gameStarted;
   }
+
+  function getRegisteredPlayers() view public returns (address[MAX_PLAYER_COUNT])
+  {
+    return registeredPlayers;
+  }
+
+  function getRegisteredPlayersWithPaidAnte() view public returns (address[MAX_PLAYER_COUNT])
+  {
+    address[MAX_PLAYER_COUNT] memory result;
+    uint pos = 0;
+    
+    for (uint i=0; i<registeredPlayerCount; i++) {
+      if (playerMode[registeredPlayers[i]] == PlayerMode.AntePlaced) { 
+        result[pos] = registeredPlayers[i];
+        pos++;
+      }
+    }
+
+    return result;
+  }
+
 
   // register a new player
   function registerPlayer() public 
