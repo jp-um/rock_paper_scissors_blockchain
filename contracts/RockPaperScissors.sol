@@ -52,12 +52,12 @@ contract RockPaperScissors is BettingEngine {
   event RockPaperScissorsGameEnding();
 
   event StartingDeclareSecretPhase();
-  event PlayerDeclaresSecret(address _player, bytes32 _secret);
+  event PlayerDeclaresSecret(address player, bytes32 secret);
 
   event StartingRevealPhase();
-  event PlayerDeclaresActualMove(address _player, Move _move);
+  event PlayerDeclaresActualMove(address player, Move _move);
 
-  event PlayerGaveFakeMoveAndLoses(address _player);
+  event PlayerGaveFakeMoveAndLoses(address player);
   event NoRevealWithinTimeout();
 
   event WinnerDeclared(address winner);

@@ -94,12 +94,12 @@ contract BettingEngine
   }
 
   // Events to keep track what is going on in the contract
-  event PlayerRegistered(address _player);
-  event PlayerPaidAnte(address _player);
-  event PlayerWithdrewAnte(address _player);
+  event PlayerRegistered(address player);
+  event PlayerPaidAnte(address player);
+  event PlayerWithdrewAnte(address player);
   event AllowGameToStart();
-  event IdentifyPlayerWinnings(address _player, uint256 amount);
-  event PlayerWithdrawsMoney(address _player, uint256 amount);
+  event IdentifyPlayerWinnings(address player, uint256 amount);
+  event PlayerWithdrawsMoney(address player, uint256 amount);
   event RestartingRegistrationPhase();
 
   // to check - todo  
