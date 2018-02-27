@@ -93,10 +93,23 @@ contract BettingEngine
     }
   }
 
+  // Events to keep track what is going on in the contract
+  event PlayerRegistered(address _player);
+  event PlayerPaidAnte(address _player);
+  event PlayerWithdrewAnte(address _player);
+  event AllowGameToStart();
+  event IdentifyPlayerWinnings(address _player, uint256 amount);
+  event PlayerWithdrawsMoney(address _player, uint256 amount);
+  event RestartingRegistrationPhase();
+  
+  function isGameReadyToStart() view public returns (bool) {
+    return gameStarted;
+  }
+
   // register a new player
   function registerPlayer() public 
     gameNotInProgress
-    playerModeIs(msg.sender, PlayerMode.Unknown)
+    playerModeIs(msg.sender, PlayerMode.Unknown) 
   {
     if (registeredPlayerCount < MAX_PLAYER_COUNT) 
     {
@@ -104,6 +117,9 @@ contract BettingEngine
       registeredPlayerCount++; 
 
       playerMode[msg.sender] = PlayerMode.Registered;
+
+      // Create the relevant event
+      PlayerRegistered(msg.sender);
     }
   }
 
@@ -116,15 +132,18 @@ contract BettingEngine
     playerMode[msg.sender] = PlayerMode.AntePlaced;
     anteBalances[msg.sender] = msg.value;
 
-    // store the money placed on the current game
+    // Store the money placed on the current game
     initialGameMoney += msg.value;
     remainingGameMoney += msg.value;
+
+    // Create the relevant event
+    PlayerPaidAnte(msg.sender);
   }
 
   // player withdraws ante
   function withdrawAnte() public
     gameNotInProgress
-    playerModeIs(msg.sender, PlayerMode.Registered)
+    playerModeIs(msg.sender, PlayerMode.AntePlaced)
   {
     uint amount = anteBalances[msg.sender];
 
@@ -133,6 +152,9 @@ contract BettingEngine
     remainingGameMoney -= amount;
 
     msg.sender.transfer(amount);
+
+    // Create the relevant event
+    PlayerWithdrewAnte(msg.sender);
   }
 
   // declare winner of what percentage of the original ante
@@ -147,6 +169,9 @@ contract BettingEngine
     uint amountToPayOut = max(remainingGameMoney, initialGameMoney * _percentage / 100);
     remainingGameMoney -= amountToPayOut;
     bankBalances[_winner] += amountToPayOut;
+
+    // Create the relevant event
+    IdentifyPlayerWinnings(_winner, amountToPayOut);
   }
 
   // start game
@@ -160,6 +185,9 @@ contract BettingEngine
     uint amountToPayOut = max(remainingGameMoney, initialGameMoney * housePercentage / 100);
     remainingGameMoney -= amountToPayOut;
     bankBalances[houseAddress] += amountToPayOut;
+
+    // Create the relevant event
+    AllowGameToStart();
   }
 
   // end of game
@@ -184,15 +212,23 @@ contract BettingEngine
     remainingGameMoney = 0;
     initialGameMoney = 0;
     percentageTaken = housePercentage;
+
+    // Create the relevant event
+    RestartingRegistrationPhase();
   }
 
   // allows everyone to withdraw their funds
   function withdraw() public
   {
-      require (bankBalances[msg.sender] > 0);
+      uint amount = bankBalances[msg.sender];
 
+      require (amount > 0);
       bankBalances[msg.sender] = 0;      
-      msg.sender.transfer(bankBalances[msg.sender]);    
+
+      msg.sender.transfer(amount);
+
+      // Create the relevant event
+      PlayerWithdrawsMoney(msg.sender, amount);
   }
 
   function max(uint a, uint b) private pure returns (uint) {
