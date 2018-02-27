@@ -1,0 +1,27 @@
+{
+  "name": "rock_paper_scissors",
+  "version": "0.1.0",
+  "private": true,
+  "main": "truffle.js",
+  "dependencies": {
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "1.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "lite-server",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "lite-server": "^2.3.0",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^3.0.0"
+  }
+}
