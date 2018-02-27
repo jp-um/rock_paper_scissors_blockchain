@@ -28,6 +28,7 @@ contract RockPaperScissors is BettingEngine {
   // State of the game
   GamePhase currentGamePhase = GamePhase.NO_GAME;
 
+
   // ----------------------------------------------------
   // Modifiers
 
@@ -47,10 +48,23 @@ contract RockPaperScissors is BettingEngine {
   // ----------------------------------------------------
   // Contract events
 
+  event RockPaperScissorsGameStarting();
+  event RockPaperScissorsGameEnding();
+
   event StartingDeclareSecretPhase();
+  event PlayerDeclaresSecret(address _player, bytes32 _secret);
+
   event StartingRevealPhase();
+  event PlayerDeclaresActualMove(address _player, Move _move);
+
+  event PlayerGaveFakeMoveAndLoses(address _player);
+  event NoRevealWithinTimeout();
+
   event WinnerDeclared(address winner);
   event DrawDeclared();
+
+
+
 
   // ----------------------------------------------------
   // Public API to access contract
@@ -66,6 +80,7 @@ contract RockPaperScissors is BettingEngine {
     {
         StartingDeclareSecretPhase();
         currentGamePhase = GamePhase.SECRET;
+        RockPaperScissorsGameStarting();
     }
   }
 
@@ -85,6 +100,7 @@ contract RockPaperScissors is BettingEngine {
     
     // remember the secret
     secretPlayerMove[msg.sender] = _secretMove;
+    PlayerDeclaresSecret(msg.sender, _secretMove);
 
     // decide whether or not to move to the reveal phase
     if (playersDeclaredSecretMove==2) 
@@ -107,6 +123,7 @@ contract RockPaperScissors is BettingEngine {
     // if the number does not match the secret, automatically lose
     if (keccak256(_actualMove) != secretPlayerMove[msg.sender]) 
     {
+      PlayerGaveFakeMoveAndLoses(msg.sender);
       declareWinner(otherPlayer(msg.sender));
       return;
     }
@@ -114,6 +131,8 @@ contract RockPaperScissors is BettingEngine {
     // remember the move
     playersDeclaredActualMove++;
     playerMove[msg.sender] = numberToMove(_actualMove);
+
+    PlayerDeclaresActualMove(msg.sender, playerMove[msg.sender]);
 
     // If both players revealed end the game, otherwise remember 
     // the time the first player revealed his/her number.
@@ -136,6 +155,8 @@ contract RockPaperScissors is BettingEngine {
       (playerMove[msg.sender] != Move.NOTHING) &&
       (now - revelationTime > timeoutToDeclareDefaultWin)
     );
+
+    NoRevealWithinTimeout();
 
     declareWinner(msg.sender);
   }
@@ -161,6 +182,8 @@ contract RockPaperScissors is BettingEngine {
     secretPlayerMove[registeredPlayers[1]] = "";
 
     // tell betting engine that the game is over
+
+    RockPaperScissorsGameEnding();
     finishGame();
   }
 

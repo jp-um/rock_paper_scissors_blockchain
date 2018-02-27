@@ -128,7 +128,6 @@ contract BettingEngine
     return result;
   }
 
-
   // register a new player
   function registerPlayer() public 
     gameNotInProgress
